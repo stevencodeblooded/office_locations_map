@@ -1,0 +1,153 @@
+body {
+    margin: 0;
+    padding: 10px;
+    background-color: #ffffff;
+    min-height: 100vh;
+}
+#map {
+    height: 100vh;
+    width: 100%;
+    border-radius: 8px;
+}
+
+.filter-buttons {
+    position: absolute;
+    top: 30px;
+    left: 60px; /* Space from the left for the zoom controls */
+    display: flex;
+    gap: 5px; /* Minimal spacing between buttons */
+    z-index: 1000; /* High z-index to bring it above the map */
+}
+
+.filter-button {
+    padding: 5px 10px;
+    border: 1px solid #e0e0e0;
+    border-radius: 40px;
+    cursor: pointer;
+    background-color: #ffffff;
+    color: #333;
+    font-size: 12px;
+    font-weight: bold;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* Slight shadow for depth */
+}
+.filter-button.active {
+    background-color: #f5f5f5;
+    border-color: #d0d0d0;
+}
+.custom-marker {
+    position: relative;
+    width: 20px !important;
+    height: 20px !important;
+}
+.custom-marker::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 14px; /* Slightly larger circle */
+    height: 14px;
+    background: #1a237e;
+    border-radius: 50%;
+    transform: translate(-50%, 0);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+.custom-marker::before {
+    content: '';
+    position: absolute;
+    top: 12px; /* Adjust to align with the circular top */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 6px solid #1a237e; /* Adjusted size */
+    z-index: -1;
+}
+/* Custom cluster styling */
+.marker-cluster-small,
+.marker-cluster-medium,
+.marker-cluster-large {
+    background-color: transparent !important;
+}
+.marker-cluster-small div,
+.marker-cluster-medium div,
+.marker-cluster-large div {
+    background-color: rgba(26, 35, 126, 0.9) !important;
+    color: white !important;
+    width: 26px !important;
+    height: 26px !important;
+    margin: 2px !important;
+    font-size: 12px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 50% !important;
+}
+
+.popup-contain {
+    background-color: #f1f1ea; 
+    border-radius: 2px; 
+    padding: 10px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* Slight shadow for depth */
+    font-family: Arial, sans-serif;
+    color: #333;
+    width: 150px;
+    text-align: left;
+    position: relative;
+}
+
+.popup-contain strong {
+    font-weight: bold;
+    font-size: 12px;
+    color: #333; /* Dark color for contrast */
+}
+
+.popup-contain .close-btn {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+    cursor: pointer;
+}
+
+.popup-contain .details {
+    font-size: 12px;
+    margin-block: 5px;
+    color: #666; /* Slightly lighter color for details */
+}
+
+.popup-contain .direction-btn {
+    display: inline-block;
+    background-color: #fbbd08; /* Button background color */
+    color: #000; /* Text color */
+    padding: 3px 6px;
+    border-radius: 2px;
+    text-decoration: none;
+    font-weight: bold;
+    margin-top: 5px;
+    font-size: 11px;
+}
+
+/* Override default Leaflet popup styles */
+.leaflet-popup-content-wrapper {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+}
+
+.leaflet-popup-close-button {
+    display: none !important;
+}
+
+.leaflet-popup-tip {
+    display: none !important; /* Remove the arrow pointer */
+}
+
+.leaflet-popup-content {
+    margin: 0 !important;
+    padding: 0 !important;
+}
