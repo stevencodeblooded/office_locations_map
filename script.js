@@ -14,20 +14,99 @@ L.control.zoom({
     position: 'topleft'
 }).addTo(map);
 
-// Initialize marker clusters with custom options
+// Add this helper function to calculate the convex hull
+function calculateConvexHull(points) {
+    // Graham Scan algorithm for convex hull
+    function cross(o, a, b) {
+        return (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]);
+    }
+    
+    points.sort(function(a, b) {
+        return a[0] - b[0] || a[1] - b[1];
+    });
+    
+    var lower = [];
+    for (var i = 0; i < points.length; i++) {
+        while (lower.length >= 2 && cross(lower[lower.length - 2], lower[lower.length - 1], points[i]) <= 0) {
+            lower.pop();
+        }
+        lower.push(points[i]);
+    }
+    
+    var upper = [];
+    for (var i = points.length - 1; i >= 0; i--) {
+        while (upper.length >= 2 && cross(upper[upper.length - 2], upper[upper.length - 1], points[i]) <= 0) {
+            upper.pop();
+        }
+        upper.push(points[i]);
+    }
+    
+    upper.pop();
+    lower.pop();
+    return lower.concat(upper);
+}
+
+// Initialize marker clusters with modified options
 const markers = L.markerClusterGroup({
     maxClusterRadius: 30,
     spiderfyOnMaxZoom: true,
-    showCoverageOnHover: false,
+    showCoverageOnHover: false, // Disable default cluster hover
     zoomToBoundsOnClick: true,
     disableClusteringAtZoom: 8,
     iconCreateFunction: function(cluster) {
         var count = cluster.getChildCount();
+        var points = cluster.getAllChildMarkers().map(marker => [
+            marker.getLatLng().lat,
+            marker.getLatLng().lng
+        ]);
+        
+        // Calculate and store the convex hull points
+        cluster._convexHull = calculateConvexHull(points);
+        
         return L.divIcon({
-            html: '<div>' + count + '</div>',
-            className: 'marker-cluster-small',
-            iconSize: L.point(30, 30)
+            html: `<div class="cluster-icon">${count}</div>`,
+            className: 'custom-cluster',
+            iconSize: L.point(40, 40)
         });
+    }
+});
+
+// Active polygon tracker
+let activePolygon = null;
+
+// Enhanced hover events for clusters
+markers.on('clustermouseover', function(event) {
+    const cluster = event.layer;
+    if (cluster._convexHull && cluster._convexHull.length > 2) {
+        // Remove any existing active polygon
+        if (activePolygon) {
+            map.removeLayer(activePolygon);
+        }
+        
+        // Create new polygon using convex hull points
+        activePolygon = L.polygon(cluster._convexHull, {
+            color: '#1a237e',
+            weight: 2,
+            opacity: 0.8,
+            fillColor: '#1a237e',
+            fillOpacity: 0.1,
+            className: 'cluster-hover-polygon'
+        }).addTo(map);
+    }
+});
+
+markers.on('clustermouseout', function(event) {
+    if (activePolygon) {
+        map.removeLayer(activePolygon);
+        activePolygon = null;
+    }
+});
+
+// Handle zoom events to clear active polygon
+map.on('zoomstart', function() {
+    if (activePolygon) {
+        map.removeLayer(activePolygon);
+        activePolygon = null;
     }
 });
 
