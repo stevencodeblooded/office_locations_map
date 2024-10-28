@@ -2,6 +2,7 @@
 const map = L.map('map', {
     zoomControl: false,
     attributionControl: false
+// }).setView([24.7136, 46.6753], 3); // You can use this if you need to view the 3 clusters upon reload
 }).setView([24.7136, 46.6753], 6);
 
 // Add custom styled tiles
@@ -85,10 +86,10 @@ markers.on('clustermouseover', function(event) {
         
         // Create new polygon using convex hull points
         activePolygon = L.polygon(cluster._convexHull, {
-            color: '#1a237e',
+            color: '#3388ff',
             weight: 2,
             opacity: 0.8,
-            fillColor: '#1a237e',
+            fillColor: '#d2e3f9',
             fillOpacity: 0.1,
             className: 'cluster-hover-polygon'
         }).addTo(map);
