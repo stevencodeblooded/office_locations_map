@@ -1,7 +1,8 @@
 // Initialize the map centered on Saudi Arabia
 const map = L.map('map', {
     zoomControl: false,
-    attributionControl: false
+    attributionControl: false,
+    scrollWheelZoom: false, // Disable default scroll wheel zoom
 // }).setView([24.7136, 46.6753], 3); // You can use this if you need to view the 3 clusters upon reload
 }).setView([24.7136, 46.6753], 6);
 
@@ -14,6 +15,79 @@ L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
 L.control.zoom({
     position: 'topleft'
 }).addTo(map);
+
+// Create and add the zoom instruction tooltip
+const zoomInstruction = L.control({position: 'bottomright'});
+
+zoomInstruction.onAdd = function (map) {
+    const div = L.DomUtil.create('div', 'zoom-instruction');
+    div.innerHTML = `
+        <div class="zoom-tooltip">
+            <span>Hold Ctrl + Scroll to zoom the map</span>
+            <button class="close-tooltip">×</button>
+        </div>
+    `;
+    
+    // Add event listener directly in the control creation
+    div.querySelector('.close-tooltip').addEventListener('click', function() {
+        const tooltip = div.querySelector('.zoom-tooltip');
+        if (tooltip) {
+            tooltip.classList.add('hidden');
+            isTooltipHidden = true;
+        }
+    });
+    
+    return div;
+};
+
+zoomInstruction.addTo(map);
+
+// Track if tooltip is hidden
+let isTooltipHidden = false;
+
+let zoomTimeout;
+function showZoomReminder() {
+    const tooltip = document.querySelector('.zoom-tooltip');
+    if (tooltip && !isTooltipHidden) {
+        tooltip.classList.remove('hidden');
+        tooltip.classList.add('flash');
+        
+        clearTimeout(zoomTimeout);
+        zoomTimeout = setTimeout(() => {
+            tooltip.classList.remove('flash');
+        }, 1000);
+    }
+}
+
+// Handle scroll events
+map.on('wheel', function(e) {
+    if (e.originalEvent.ctrlKey) {
+        // If Ctrl is pressed, enable zoom
+        if (!map.scrollWheelZoom.enabled()) {
+            map.scrollWheelZoom.enable();
+        }
+    } else {
+        // If Ctrl is not pressed, disable zoom and show reminder
+        if (map.scrollWheelZoom.enabled()) {
+            map.scrollWheelZoom.disable();
+        }
+        showZoomReminder();
+    }
+});
+
+// Disable zoom when Ctrl is released
+document.addEventListener('keyup', function(e) {
+    if (e.key === 'Control') {
+        map.scrollWheelZoom.disable();
+    }
+});
+
+// Enable zoom when Ctrl is pressed
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Control') {
+        map.scrollWheelZoom.enable();
+    }
+});
 
 // Add this helper function to calculate the convex hull
 function calculateConvexHull(points) {

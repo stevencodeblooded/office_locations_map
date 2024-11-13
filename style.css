@@ -224,3 +224,50 @@ body {
     border-radius: 50% !important;
     box-shadow: 0 2px 4px rgba(0,0,0,0.2) !important;
 }
+
+/* Add these styles to your existing CSS */
+/* Add these styles to your existing CSS */
+.zoom-tooltip {
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 14px;
+    margin: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.zoom-tooltip.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.zoom-tooltip.flash {
+    animation: flash 1s ease;
+}
+
+@keyframes flash {
+    0% { opacity: 0.8; }
+    50% { opacity: 1; }
+    100% { opacity: 0.8; }
+}
+
+.close-tooltip {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    font-size: 18px;
+    padding: 0 4px;
+    line-height: 1;
+}
+
+.close-tooltip:hover {
+    opacity: 0.8;
+}
